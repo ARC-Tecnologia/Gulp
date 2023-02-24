@@ -14,7 +14,7 @@ const reload = browserSync.reload
 
 function tarefasCSS(cb) {
 
-    gulp.src([
+    return gulp.src([
             './node_modules/bootstrap/dist/css/bootstrap.css',
             './node_modules/@fortawesome/fontawesome-free/css/fontawesome.css',
             './vendor/owl/css/owl.css',
@@ -26,19 +26,22 @@ function tarefasCSS(cb) {
         .pipe(cssmin())                     // minifica css
         .pipe(rename({ suffix: '.min'}))    // styles.min.css
         .pipe(gulp.dest('./dist/css'))      // cria arquivo em novo diretório
+        .on('end', () => {
+            console.log("tarefas css concluídas")
+        } )
 
-    cb()
+    return cb()
 
 }
 
 function tarefasJS(callback){
 
-    gulp.src([
+    return gulp.src([
             './node_modules/jquery/dist/jquery.js',
             './node_modules/bootstrap/dist/js/bootstrap.js',
             './vendor/owl/js/owl.js',
             './vendor/jquery-mask/jquery.mask.js',
-            // './vendor/jquery-ui/jquery-ui.js',
+            './vendor/jquery-ui/jquery-ui.js',
             './src/js/custom.js'
         ])
         .pipe(babel({
@@ -49,6 +52,9 @@ function tarefasJS(callback){
         .pipe(uglify())                     // minifica js
         .pipe(rename({ suffix: '.min'}))    // scripts.min.js
         .pipe(gulp.dest('./dist/js'))       // cria arquivo em novo diretório
+        .on('end', () => {
+            console.log("tarefas JS concluídas")
+        })
 
     return callback()
 }
@@ -93,16 +99,11 @@ gulp.task('serve', function(){
 
 })
 
-function end(cb){
-    console.log("tarefas concluídas")
-    return cb()
-}
-
 // series x parallel
-const process = parallel( tarefasHTML, tarefasJS, tarefasCSS, end)
+const process = parallel( tarefasHTML, tarefasJS, tarefasCSS )
 
 exports.styles = tarefasCSS
 exports.scripts = tarefasJS
 exports.images = tarefasImagem
 
-exports.default = process
+exports.default = series(process);
